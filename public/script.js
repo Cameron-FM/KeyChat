@@ -6,12 +6,25 @@ const messageContainer = document.getElementById('message-container')
 const messageForm = document.getElementById('send-container')
 const messageInput = document.getElementById('message-input')
 
-const username = prompt('Enter Your Nickname:')
-appendMessage('You Joined The Server')
-socket.emit('new-user', username)
+ //Only runs when user joins a server
+if (messageForm != null){
+  //Asks user to enter their nickname when joining the server
+  const username = prompt('Enter Your Nickname:')
+  appendMessage('You Joined The Server')
+  socket.emit('new-user', roomName, username)
+
+  //Listen for submit button press
+  messageForm.addEventListener('submit', e => {
+    e.preventDefault() //Stop page from auto reloading when form is submitted
+    const message = messageInput.value
+    socket.emit('send-chat-message', roomName, message) //Send chat message to server
+    appendMessage(`${username}: ${message}`)
+    messageInput.value = '' //Clear the input field
+  })
+}
 
 //Whenever the client recives a message run appendMessage()
-socket.on('chat-message', data => {
+socket.on('recive-chat-message', data => {
   appendMessage(`${data.name}: ${data.message}`)
 })
 
@@ -23,15 +36,6 @@ socket.on('user-connected', username => {
 //Whenever a new user connects run appendMessage()
 socket.on('user-disconnected', username => {
   appendMessage(`${username}: Disconnected From The Server`)
-})
-
-//Listen for submit button press
-messageForm.addEventListener('submit', e => {
-  e.preventDefault() //Stop page from auto reloading when form is submitted
-  const message = messageInput.value
-  socket.emit('send-chat-message', message) //Send chat message to server
-  appendMessage(`${username}: ${message}`)
-  messageInput.value = '' //Clear the input field
 })
 
 //Append a message element to the page containing the message data

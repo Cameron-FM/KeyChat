@@ -10,8 +10,8 @@ app.set('view engine', 'ejs') //Tell app views to use ejs
 app.use(express.static('public')) //State the public folder where client side JS will be held
 app.use(express.urlencoded({extended: true})) //Allows app to use URL encoded parameters inside of a body for a form
 
-const rooms = { name: {}}
-const users = {}
+//Create object for chat rooms
+const rooms = {}
 
 //Create routes for the server
 app.get('/', (req, res) => {
@@ -27,26 +27,43 @@ app.post('/room', (req, res) => {
 })
 
 app.get('/:room', (req, res) => {
+  if (rooms[req.params.room] == null){
+    res.redirect('/')
+  }
   res.render('room', {roomName: req.params.room})
 })
 
 //Server will listen on port 3000
 server.listen(3000)
 
+//Get the rooms a specific user is in
+function getUserRooms(socket){
+  return Object.entries(rooms).reduce((names, [name, room]) => {
+    if (room.users[socket.id] != null) names.push(name) //If there is a user with this socket ID, push in the name of the room
+    return names //Returns to use in next itteration of the reduce method
+  }, [])
+}
+
 //Log whenever a new user connects
 io.on('connection', socket => {
-  //Broadcast that a new user had joined to al other users
-  socket.on('new-user', username => {
-    users[socket.id] = username //Assign the users name to their socket ID
-    socket.broadcast.emit('user-connected', username)
+  //Broadcast that a new user had joined to al other users in that specific room
+  socket.on('new-user', (room, username) => {
+    socket.join(room)
+    rooms[room].users[socket.id] = username //Assign the users name to their socket ID and store in the object with the room name their in
+    socket.to(room).broadcast.emit('user-connected', username)
   })
-  //Broadcast a user disconnect message to all other users
+
+  //Broadcast a user disconnect message to all other users in that specific room
   socket.on('disconnect', () => {
-    socket.broadcast.emit('user-disconnected', users[socket.id])
-    delete users[socket.id] // Delete users ID from the user array
+    getUserRooms(socket).forEach(room => {
+      socket.to(room).broadcast.emit('user-disconnected', rooms[room].users[socket.id])
+      delete rooms[room].users[socket.id] // Delete users ID from the object with the room name their in
+    })
+
   })
-  //Broadcast chat message to all other users
-  socket.on('send-chat-message', message => {
-    socket.broadcast.emit('chat-message', {name: users[socket.id], message: message})
+
+  //Broadcast chat message to all other users in that specific room
+  socket.on('send-chat-message', (room, message) => {
+    socket.to(room).broadcast.emit('recive-chat-message', {name:  rooms[room].users[socket.id], message: message})
   })
 })
