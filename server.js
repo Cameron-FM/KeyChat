@@ -11,6 +11,11 @@ io.on('connection', socket => {
     users[socket.id] = username //Assign the users name to their socket ID
     socket.broadcast.emit('user-connected', username)
   })
+  //Broadcast a user disconnect message to all other users
+  socket.on('disconnect', () => {
+    socket.broadcast.emit('user-disconnected', users[socket.id])
+    delete users[socket.id] // Delete users ID from the user array
+  })
   //Broadcast chat message to all other users
   socket.on('send-chat-message', message => {
     socket.broadcast.emit('chat-message', {name: users[socket.id], message: message})

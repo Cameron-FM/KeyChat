@@ -20,6 +20,11 @@ socket.on('user-connected', username => {
   appendMessage(`${username} Connected To The Server`)
 })
 
+//Whenever a new user connects run appendMessage()
+socket.on('user-disconnected', username => {
+  appendMessage(`${username} Disconnected From The Server`)
+})
+
 //Listen for submit button press
 messageForm.addEventListener('submit', e => {
   e.preventDefault() //Stop page from auto reloading when form is submitted
