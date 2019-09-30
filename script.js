@@ -1,5 +1,5 @@
 //Where the server is hosting the socket.js application
-const socket = io ('http://localhost:3000')
+const socket = io('http://localhost:3000')
 
 //Get data from HTML elements
 const messageContainer = document.getElementById('message-container')
@@ -12,7 +12,7 @@ socket.emit('new-user', username)
 
 //Whenever the client recives a message run appendMessage()
 socket.on('chat-message', data => {
-  appendMessage(data)
+  appendMessage(`${data.name}: ${data.message}`)
 })
 
 //Whenever a new user connects run appendMessage()
@@ -25,6 +25,7 @@ messageForm.addEventListener('submit', e => {
   e.preventDefault() //Stop page from auto reloading when form is submitted
   const message = messageInput.value
   socket.emit('send-chat-message', message) //Send chat message to server
+  appendMessage(`${username}: ${message}`)
   messageInput.value = '' //Clear the input field
 })
 
