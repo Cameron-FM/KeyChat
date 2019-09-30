@@ -8,7 +8,7 @@ const messageInput = document.getElementById('message-input')
 
 //Whenever the client recives a message run appendMessage()
 socket.on('chat-message', data => {
-  console.log(data);
+  appendMessage(data)
 })
 
 //Listen for submit button press
@@ -18,3 +18,11 @@ messageForm.addEventListener('submit', e => {
   socket.emit('send-chat-message', message)//Send chat message to server
   messageInput.value = ''//Clear the input field
 })
+
+//Append a message element to the page containing the message data
+function appendMessage(message){
+  messageElement = document.createElement('div')
+  messageElement.innerText = message
+  messageContainer.append(messageElement)
+
+}
