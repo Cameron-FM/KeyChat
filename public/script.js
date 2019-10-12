@@ -5,6 +5,16 @@ const socket = io('http://localhost:3000')
 const messageContainer = document.getElementById('message-container')
 const messageForm = document.getElementById('send-container')
 const messageInput = document.getElementById('message-input')
+const searchForm = document.getElementById('search-bar')
+const searchBar = document.getElementById('search-input')
+
+//Sends the users search to the server everytime they lift a key
+if (searchForm != null){
+  searchBar.addEventListener('keyup', e => {
+    let searchText = document.getElementById('search-input').value.toLowerCase()
+    socket.emit('room-search', socket.id, searchText)
+  })
+}
 
  //Only runs when user joins a server
 if (messageForm != null){
@@ -22,6 +32,12 @@ if (messageForm != null){
     messageInput.value = '' //Clear the input field
   })
 }
+
+//Recvices the items that match the users search
+//Doesn't work
+socket.on('search-items', items => {
+  console.log(items);
+})
 
 //Whenever the client recives a message run appendMessage()
 socket.on('recive-chat-message', data => {
