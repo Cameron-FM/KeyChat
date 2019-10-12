@@ -53,6 +53,18 @@ io.on('connection', socket => {
     socket.to(room).broadcast.emit('user-connected', username)
   })
 
+  //Searchs the rooms object for a room that matchs search
+  //Recvies id & text from client but doesnt run line 59
+  socket.on('room-search', (id, text) => {
+    Array.from(Object.keys(rooms)).forEach((room) => {
+      console.log(room);
+      if (room.slice(0, text.length).includes(text)){
+        //socket.to(id).broadcast.emit('search-items', room)
+        console.log(room);
+      }
+    })
+  })
+
   //Broadcast a user disconnect message to all other users in that specific room
   socket.on('disconnect', () => {
     getUserRooms(socket).forEach(room => {
