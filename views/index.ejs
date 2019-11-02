@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,20 +8,32 @@
   <title>KeyChat</title>
   <script defer src="http://localhost:3000/socket.io/socket.io.js"></script>
   <script defer src="script.js"></script>
+
+  <style>
+    .room {
+      border: solid red 1px;
+    }
+
+    #room-container {
+      width: 200px
+    }
+  </style>
 </head>
+
 <body>
-  <form id="search-bar">
+  <form id="search-bar" autocomplete="off">
     <input id="search-input" name="search" type="text" placeholder="Search For a Room..." required></input>
   </form>
   <div id=room-container>
-    <% Object.keys(rooms).forEach(room => { %>
+    <!--<% Object.keys(rooms).forEach(room => { %>
       <div><%= room %></div>
       <a href="/<%= room %>">Join</a>
-      <% }) %>
+      <% }) %> -->
   </div>
-  <form action="/room" method="POST">
+  <form action="/room" method="POST" autocomplete="off">
     <input name="room" type="text" required></input>
     <button type="submit">Create New Room</button>
   </form>
 </body>
+
 </html>
